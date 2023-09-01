@@ -1,6 +1,7 @@
 package com.employee.serviceImpl;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<TaxDeductionResponse> getTaxDeductions() {
 		List<Employee> employees = employeeRepository.findAll();
         List<TaxDeductionResponse> deductions = new ArrayList<>();
-
+        double lop = 0;
         for (Employee employee : employees) {
             LocalDate joiningDate = employee.getDoj();
             LocalDate startOfYear = joiningDate.withMonth(4).withDayOfMonth(1);
             LocalDate endOfYear = joiningDate.plusYears(1).withMonth(3).withDayOfMonth(31);
 
             if (joiningDate.isAfter(startOfYear)) {
-                startOfYear = joiningDate.plusYears(1).withMonth(4).withDayOfMonth(1);
-                endOfYear = joiningDate.plusYears(2).withMonth(3).withDayOfMonth(31);
+//                startOfYear = joiningDate.plusYears(1).withMonth(4).withDayOfMonth(1);
+//                endOfYear = joiningDate.plusYears(2).withMonth(3).withDayOfMonth(31);
+            	  startOfYear = joiningDate;
+                //lop = ChronoUnit.DAYS.between(startOfYear, joiningDate) * employee.getSalary()/30;
             }
+            //System.out.println("joiningDate " + joiningDate + " startOfYear " + startOfYear + " endOfYear " + endOfYear);
 
-            double totalSalary = employee.getSalary() * ((double) (endOfYear.getDayOfYear() - startOfYear.getDayOfYear() + 1) / 365);
+           // System.out.println("lop" +ChronoUnit.DAYS.between(startOfYear, joiningDate));
+     
+            
+            double totalSalary = employee.getSalary() * (ChronoUnit.MONTHS.between(startOfYear, endOfYear) + 1) ;
+           // System.out.println(totalSalary + " total salary for " + employee.getFirstName());
             double yearlySalary = employee.getSalary() * 12;
 
             double taxAmount = calculateTax(totalSalary);
